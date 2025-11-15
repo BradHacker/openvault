@@ -6,7 +6,7 @@ import (
 	"github.com/BradHacker/openvault/openvault/internal/fs"
 	"github.com/BradHacker/openvault/openvault/internal/structs"
 
-	"github.com/BradHacker/openvault/openvault/cryptolib"
+	"github.com/BradHacker/openvault/cryptolib"
 )
 
 type State struct {

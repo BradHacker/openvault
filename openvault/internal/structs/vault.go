@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/BradHacker/openvault/openvault/cryptolib"
+	"github.com/BradHacker/openvault/cryptolib"
 )
 
 type Vault struct {

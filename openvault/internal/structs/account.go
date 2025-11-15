@@ -3,7 +3,7 @@ package structs
 import (
 	"fmt"
 
-	"github.com/BradHacker/openvault/openvault/cryptolib"
+	"github.com/BradHacker/openvault/cryptolib"
 )
 
 type Account struct {

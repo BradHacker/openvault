@@ -5,7 +5,7 @@ import (
 
 	"github.com/BradHacker/openvault/openvault/internal/constants"
 
-	"github.com/BradHacker/openvault/openvault/cryptolib"
+	"github.com/BradHacker/openvault/cryptolib"
 )
 
 var keySetFile = path.Join(constants.DATA_DIR, "keysets.json")
