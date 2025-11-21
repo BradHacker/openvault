@@ -4,6 +4,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@custom-variant data-open (&[data-state~="open"]);
+
 body {
   @apply m-0;
   font-family:
@@ -146,15 +148,11 @@ code {
   }
 
   #app {
-    @apply h-screen w-screen overflow-hidden rounded-md bg-background text-foreground;
+    @apply h-screen w-screen bg-background text-foreground;
   }
-}
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
+  html,
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
 }

@@ -10,7 +10,7 @@ import (
 var vaultFile = path.Join(constants.DATA_DIR, "vaults.json")
 
 // VaultStore is a map of vaults by their associated account IDs
-type VaultStore map[string][]*structs.Vault
+type VaultStore map[string]*structs.Vault
 
 // VaultsExists checks if the vaults file exists
 func VaultsExists() bool {

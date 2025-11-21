@@ -5,7 +5,11 @@ import {
   CardDescription,
   CardTitle
 } from '@/components/ui/card';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  useNavigate,
+  useRouter
+} from '@tanstack/react-router';
 import { z } from 'zod';
 import { useForm } from '@tanstack/react-form';
 import { toast } from 'sonner';
@@ -18,8 +22,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { IdCardLanyard, Loader } from 'lucide-react';
-import { Initialize } from '@/wailsjs/go/main/App';
-import { fs } from '@/wailsjs/go/models';
+import { InitOptions } from '@openvault/openvault/internal/fs';
+import { useInitialize } from '@/context/initialize';
 
 export const Route = createFileRoute('/initialize')({
   component: InitializeForm
@@ -42,6 +46,8 @@ const formSchema = z
 
 function InitializeForm() {
   const navigate = useNavigate();
+  const router = useRouter();
+  const { initialize } = useInitialize();
   const form = useForm({
     defaultValues: {
       email: '',
@@ -57,17 +63,18 @@ function InitializeForm() {
     },
     onSubmit: async ({ value }) => {
       try {
-        const data = new fs.InitOptions();
+        const data = new InitOptions();
         data.Email = value.email;
         data.FirstName = value.firstName;
         data.LastName = value.lastName;
         data.Password = value.password;
-        await Initialize(data);
+        await initialize(data);
         toast.success('Account created successfully!');
+        await router.invalidate();
         navigate({
           to: '/lock',
           search: {
-            redirect: '/vaults/all'
+            redirect: '/all'
           }
         });
       } catch (error) {

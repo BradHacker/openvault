@@ -9,7 +9,7 @@ import (
 
 var accountFile = path.Join(constants.DATA_DIR, "accounts.json")
 
-// KeySetStore is a map of keysets by their associated account IDs
+// AccountStore is a map of accounts by their IDs
 type AccountStore map[string]*structs.Account
 
 // AccountsExists checks if the accounts file exists

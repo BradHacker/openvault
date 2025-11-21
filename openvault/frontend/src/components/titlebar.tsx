@@ -1,12 +1,6 @@
 import { Maximize, Minimize, Minus, Vault, X } from 'lucide-react';
 import { Button } from './ui/button';
-import {
-  Hide,
-  Quit,
-  WindowIsMaximised,
-  WindowMaximise,
-  WindowUnmaximise
-} from '@/wailsjs/runtime/runtime';
+import { Application, Window } from '@wailsio/runtime';
 import { useEffect, useState } from 'react';
 import {
   Menubar,
@@ -24,7 +18,7 @@ import {
   MenubarTrigger
 } from './ui/menubar';
 import { useAccounts } from '@/state/account';
-import { useLock } from '@/lock';
+import { useLock } from '@/context/lock';
 import { cn } from '@/lib/utils';
 
 export function TitleBar({ className }: { className?: string }) {
@@ -32,7 +26,7 @@ export function TitleBar({ className }: { className?: string }) {
 
   useEffect(() => {
     const checkMaximized = async () => {
-      const maximized = await WindowIsMaximised();
+      const maximized = await Window.IsMaximised();
       setIsMaximized(maximized);
     };
     checkMaximized().catch((err) => {
@@ -64,7 +58,7 @@ export function FloatingWindowControls() {
 
   useEffect(() => {
     const checkMaximized = async () => {
-      const maximized = await WindowIsMaximised();
+      const maximized = await Window.IsMaximised();
       setIsMaximized(maximized);
     };
     checkMaximized().catch((err) => {
@@ -74,16 +68,16 @@ export function FloatingWindowControls() {
 
   return (
     <div className="fixed top-0 right-0 flex h-10 items-center gap-x-2 px-2">
-      <WindowControlButton onClick={() => Hide()}>
+      <WindowControlButton onClick={() => Window.Minimise()}>
         <Minus className="size-4" />
       </WindowControlButton>
       <WindowControlButton
         onClick={() => {
           if (isMaximized) {
-            WindowUnmaximise();
+            Window.UnMaximise();
             setIsMaximized(false);
           } else {
-            WindowMaximise();
+            Window.Maximise();
             setIsMaximized(true);
           }
         }}
@@ -94,7 +88,7 @@ export function FloatingWindowControls() {
           <Maximize className="size-4" />
         )}
       </WindowControlButton>
-      <WindowControlButton onClick={() => Quit()}>
+      <WindowControlButton onClick={() => Application.Quit()}>
         <X className="size-4" />
       </WindowControlButton>
     </div>

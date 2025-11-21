@@ -8,7 +8,8 @@ import (
 )
 
 type Vault struct {
-	ID                string         `json:"id"`
+	VaultID           string         `json:"vault_id"`
+	AccountID         string         `json:"account_id"`
 	EncryptedMetadata *cryptolib.JWE `json:"encrypted_metadata"`
 	EncryptedVaultKey *cryptolib.JWE `json:"encrypted_vault_key"`
 }
@@ -91,6 +92,7 @@ func (v *Vault) DecryptItemDetails(privKey *cryptolib.JWK, encryptedDetails *Enc
 }
 
 type VaultMetadata struct {
+	AccountID   string `json:"account_id"`
 	VaultID     string `json:"vault_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`

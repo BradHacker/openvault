@@ -6,7 +6,12 @@ import {
 } from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  redirect,
+  useNavigate,
+  useRouter
+} from '@tanstack/react-router';
 import { ArrowRight, Lock, Vault } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -30,7 +35,7 @@ function LockScreen() {
   const { lock } = Route.useRouteContext();
   const { redirect } = Route.useSearch();
   const navigate = useNavigate();
-  // const router = useRouter();
+  const router = useRouter();
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [shakeLock, setShakeLock] = useState<boolean>(false);
@@ -41,7 +46,7 @@ function LockScreen() {
     try {
       await lock.unlock(password);
       console.log('Vault unlocked successfully');
-      // await router.invalidate({ sync: true });
+      await router.invalidate({ sync: true });
       navigate({
         to: redirect,
         viewTransition: true
@@ -58,6 +63,11 @@ function LockScreen() {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-4">
+      {/* Invisible draggable area */}
+      <div
+        className="fixed top-0 left-0 h-10 w-screen"
+        style={{ '--wails-draggable': 'drag' }}
+      />
       <h1 className="flex items-center gap-2 text-2xl font-bold text-primary">
         <Vault className="size-8" /> OpenVault
       </h1>

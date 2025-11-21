@@ -9,8 +9,8 @@ import (
 
 var itemOverviewsFile = path.Join(constants.DATA_DIR, "item_overviews.json")
 
-// ItemOverviewsStore is a map of item overviews by their associated vault IDs
-type ItemOverviewsStore map[string][]*structs.EncryptedVaultItemOverview
+// ItemOverviewsStore is a map of item overviews by their IDs
+type ItemOverviewsStore map[string]*structs.EncryptedVaultItemOverview
 
 // ItemOverviewsExists checks if the item overviews file exists
 func ItemOverviewsExists() bool {

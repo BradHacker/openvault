@@ -12,10 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LockRouteImport } from './routes/lock'
 import { Route as InitializeRouteImport } from './routes/initialize'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated.index'
-import { Route as AuthenticatedVaultsRouteImport } from './routes/_authenticated/vaults'
-import { Route as AuthenticatedVaultsIdRouteImport } from './routes/_authenticated/vaults/$id'
-import { Route as AuthenticatedVaultsIdItemsItemIdRouteImport } from './routes/_authenticated/vaults/$id/items.$itemId'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedLayoutRouteImport } from './routes/_authenticated/_layout'
+import { Route as AuthenticatedLayoutItemFilterRouteImport } from './routes/_authenticated/_layout.$itemFilter'
+import { Route as AuthenticatedLayoutItemFilterItemIdRouteImport } from './routes/_authenticated/_layout.$itemFilter.$itemId'
 
 const LockRoute = LockRouteImport.update({
   id: '/lock',
@@ -31,83 +31,75 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedLayoutRoute = AuthenticatedLayoutRouteImport.update({
+  id: '/_layout',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedVaultsRoute = AuthenticatedVaultsRouteImport.update({
-  id: '/vaults',
-  path: '/vaults',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedVaultsIdRoute = AuthenticatedVaultsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => AuthenticatedVaultsRoute,
-} as any)
-const AuthenticatedVaultsIdItemsItemIdRoute =
-  AuthenticatedVaultsIdItemsItemIdRouteImport.update({
-    id: '/items/$itemId',
-    path: '/items/$itemId',
-    getParentRoute: () => AuthenticatedVaultsIdRoute,
+const AuthenticatedLayoutItemFilterRoute =
+  AuthenticatedLayoutItemFilterRouteImport.update({
+    id: '/$itemFilter',
+    path: '/$itemFilter',
+    getParentRoute: () => AuthenticatedLayoutRoute,
+  } as any)
+const AuthenticatedLayoutItemFilterItemIdRoute =
+  AuthenticatedLayoutItemFilterItemIdRouteImport.update({
+    id: '/$itemId',
+    path: '/$itemId',
+    getParentRoute: () => AuthenticatedLayoutItemFilterRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/initialize': typeof InitializeRoute
   '/lock': typeof LockRoute
-  '/vaults': typeof AuthenticatedVaultsRouteWithChildren
-  '/': typeof AuthenticatedIndexRoute
-  '/vaults/$id': typeof AuthenticatedVaultsIdRouteWithChildren
-  '/vaults/$id/items/$itemId': typeof AuthenticatedVaultsIdItemsItemIdRoute
+  '/$itemFilter': typeof AuthenticatedLayoutItemFilterRouteWithChildren
+  '/$itemFilter/$itemId': typeof AuthenticatedLayoutItemFilterItemIdRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/initialize': typeof InitializeRoute
   '/lock': typeof LockRoute
-  '/vaults': typeof AuthenticatedVaultsRouteWithChildren
-  '/': typeof AuthenticatedIndexRoute
-  '/vaults/$id': typeof AuthenticatedVaultsIdRouteWithChildren
-  '/vaults/$id/items/$itemId': typeof AuthenticatedVaultsIdItemsItemIdRoute
+  '/$itemFilter': typeof AuthenticatedLayoutItemFilterRouteWithChildren
+  '/$itemFilter/$itemId': typeof AuthenticatedLayoutItemFilterItemIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/initialize': typeof InitializeRoute
   '/lock': typeof LockRoute
-  '/_authenticated/vaults': typeof AuthenticatedVaultsRouteWithChildren
-  '/_authenticated/': typeof AuthenticatedIndexRoute
-  '/_authenticated/vaults/$id': typeof AuthenticatedVaultsIdRouteWithChildren
-  '/_authenticated/vaults/$id/items/$itemId': typeof AuthenticatedVaultsIdItemsItemIdRoute
+  '/_authenticated/_layout': typeof AuthenticatedLayoutRouteWithChildren
+  '/_authenticated/_layout/$itemFilter': typeof AuthenticatedLayoutItemFilterRouteWithChildren
+  '/_authenticated/_layout/$itemFilter/$itemId': typeof AuthenticatedLayoutItemFilterItemIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/initialize'
     | '/lock'
-    | '/vaults'
-    | '/'
-    | '/vaults/$id'
-    | '/vaults/$id/items/$itemId'
+    | '/$itemFilter'
+    | '/$itemFilter/$itemId'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/initialize'
-    | '/lock'
-    | '/vaults'
-    | '/'
-    | '/vaults/$id'
-    | '/vaults/$id/items/$itemId'
+  to: '/' | '/initialize' | '/lock' | '/$itemFilter' | '/$itemFilter/$itemId'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/initialize'
     | '/lock'
-    | '/_authenticated/vaults'
-    | '/_authenticated/'
-    | '/_authenticated/vaults/$id'
-    | '/_authenticated/vaults/$id/items/$itemId'
+    | '/_authenticated/_layout'
+    | '/_authenticated/_layout/$itemFilter'
+    | '/_authenticated/_layout/$itemFilter/$itemId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   InitializeRoute: typeof InitializeRoute
   LockRoute: typeof LockRoute
@@ -136,69 +128,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
+    '/': {
+      id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/_layout': {
+      id: '/_authenticated/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedLayoutRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/vaults': {
-      id: '/_authenticated/vaults'
-      path: '/vaults'
-      fullPath: '/vaults'
-      preLoaderRoute: typeof AuthenticatedVaultsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated/_layout/$itemFilter': {
+      id: '/_authenticated/_layout/$itemFilter'
+      path: '/$itemFilter'
+      fullPath: '/$itemFilter'
+      preLoaderRoute: typeof AuthenticatedLayoutItemFilterRouteImport
+      parentRoute: typeof AuthenticatedLayoutRoute
     }
-    '/_authenticated/vaults/$id': {
-      id: '/_authenticated/vaults/$id'
-      path: '/$id'
-      fullPath: '/vaults/$id'
-      preLoaderRoute: typeof AuthenticatedVaultsIdRouteImport
-      parentRoute: typeof AuthenticatedVaultsRoute
-    }
-    '/_authenticated/vaults/$id/items/$itemId': {
-      id: '/_authenticated/vaults/$id/items/$itemId'
-      path: '/items/$itemId'
-      fullPath: '/vaults/$id/items/$itemId'
-      preLoaderRoute: typeof AuthenticatedVaultsIdItemsItemIdRouteImport
-      parentRoute: typeof AuthenticatedVaultsIdRoute
+    '/_authenticated/_layout/$itemFilter/$itemId': {
+      id: '/_authenticated/_layout/$itemFilter/$itemId'
+      path: '/$itemId'
+      fullPath: '/$itemFilter/$itemId'
+      preLoaderRoute: typeof AuthenticatedLayoutItemFilterItemIdRouteImport
+      parentRoute: typeof AuthenticatedLayoutItemFilterRoute
     }
   }
 }
 
-interface AuthenticatedVaultsIdRouteChildren {
-  AuthenticatedVaultsIdItemsItemIdRoute: typeof AuthenticatedVaultsIdItemsItemIdRoute
+interface AuthenticatedLayoutItemFilterRouteChildren {
+  AuthenticatedLayoutItemFilterItemIdRoute: typeof AuthenticatedLayoutItemFilterItemIdRoute
 }
 
-const AuthenticatedVaultsIdRouteChildren: AuthenticatedVaultsIdRouteChildren = {
-  AuthenticatedVaultsIdItemsItemIdRoute: AuthenticatedVaultsIdItemsItemIdRoute,
-}
+const AuthenticatedLayoutItemFilterRouteChildren: AuthenticatedLayoutItemFilterRouteChildren =
+  {
+    AuthenticatedLayoutItemFilterItemIdRoute:
+      AuthenticatedLayoutItemFilterItemIdRoute,
+  }
 
-const AuthenticatedVaultsIdRouteWithChildren =
-  AuthenticatedVaultsIdRoute._addFileChildren(
-    AuthenticatedVaultsIdRouteChildren,
+const AuthenticatedLayoutItemFilterRouteWithChildren =
+  AuthenticatedLayoutItemFilterRoute._addFileChildren(
+    AuthenticatedLayoutItemFilterRouteChildren,
   )
 
-interface AuthenticatedVaultsRouteChildren {
-  AuthenticatedVaultsIdRoute: typeof AuthenticatedVaultsIdRouteWithChildren
+interface AuthenticatedLayoutRouteChildren {
+  AuthenticatedLayoutItemFilterRoute: typeof AuthenticatedLayoutItemFilterRouteWithChildren
 }
 
-const AuthenticatedVaultsRouteChildren: AuthenticatedVaultsRouteChildren = {
-  AuthenticatedVaultsIdRoute: AuthenticatedVaultsIdRouteWithChildren,
+const AuthenticatedLayoutRouteChildren: AuthenticatedLayoutRouteChildren = {
+  AuthenticatedLayoutItemFilterRoute:
+    AuthenticatedLayoutItemFilterRouteWithChildren,
 }
 
-const AuthenticatedVaultsRouteWithChildren =
-  AuthenticatedVaultsRoute._addFileChildren(AuthenticatedVaultsRouteChildren)
+const AuthenticatedLayoutRouteWithChildren =
+  AuthenticatedLayoutRoute._addFileChildren(AuthenticatedLayoutRouteChildren)
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedVaultsRoute: typeof AuthenticatedVaultsRouteWithChildren
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedLayoutRoute: typeof AuthenticatedLayoutRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedVaultsRoute: AuthenticatedVaultsRouteWithChildren,
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedLayoutRoute: AuthenticatedLayoutRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -206,6 +199,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   InitializeRoute: InitializeRoute,
   LockRoute: LockRoute,

@@ -16,7 +16,7 @@ type State struct {
 	Accounts fs.AccountStore
 	// Keysets mapped by their associated account IDs
 	KeySets fs.KeySetStore
-	// Vaults mapped by their IDs
+	// Vaults mapped by their associated account IDs
 	Vaults fs.VaultStore
 	// The current set of decrypted vault item overviews
 	ItemOverviews fs.ItemOverviewsStore
@@ -26,23 +26,19 @@ type State struct {
 	AUK map[string]*cryptolib.JWK
 }
 
-func (s *State) LookupVaultID(vaultId string) (accountId string, auk *cryptolib.JWK, vault *structs.Vault, err error) {
+func (s *State) LookupVaultCrypto(vaultId string) (keySet *cryptolib.KeySet, auk *cryptolib.JWK, vault *structs.Vault, err error) {
 	// Determine which account the vault belongs to
-	for accId, vaults := range s.Vaults {
-		for _, v := range vaults {
-			if v.ID == vaultId {
-				accountId = accId
-				vault = v
-				break
-			}
-		}
-	}
-	if vault == nil {
-		return "", nil, nil, fmt.Errorf("vault %s not found", vaultId)
-	}
-	auk, ok := s.AUK[accountId]
+	vault, ok := s.Vaults[vaultId]
 	if !ok {
-		return "", nil, nil, fmt.Errorf("account %s is locked", accountId)
+		return nil, nil, nil, fmt.Errorf("vault %s not found", vaultId)
 	}
-	return accountId, auk, vault, nil
+	auk, ok = s.AUK[vault.AccountID]
+	if !ok {
+		return nil, nil, nil, fmt.Errorf("account %q is locked", vault.AccountID)
+	}
+	keySet, ok = s.KeySets[vault.AccountID]
+	if !ok {
+		return nil, nil, nil, fmt.Errorf("no keyset found for active account %q", vault.AccountID)
+	}
+	return keySet, auk, vault, nil
 }

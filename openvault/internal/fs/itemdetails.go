@@ -9,8 +9,8 @@ import (
 
 var itemDetailsFile = path.Join(constants.DATA_DIR, "item_details.json")
 
-// ItemDetailsStore is a map of item details by their associated vault IDs
-type ItemDetailsStore map[string][]*structs.EncryptedVaultItemDetails
+// ItemDetailsStore is a map of item details by their IDs
+type ItemDetailsStore map[string]*structs.EncryptedVaultItemDetails
 
 // ItemDetailsExists checks if the item details file exists
 func ItemDetailsExists() bool {

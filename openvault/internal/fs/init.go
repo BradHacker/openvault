@@ -26,15 +26,18 @@ func init() {
 		itemDetailsFile,
 	}
 	for _, file := range files {
+		fmt.Printf("checking if %q exists...\n", file)
 		if _, err := os.Stat(file); os.IsNotExist(err) {
+			fmt.Printf("file %q does not exist\n", file)
 			initialized = false
 			return
 		}
+		fmt.Printf("file %q exists\n", file)
 	}
 	initialized = true
 }
 
-func IsInitializesd() bool {
+func IsInitialized() bool {
 	return initialized
 }
 
@@ -58,9 +61,10 @@ func InitializeAccount(opts *InitOptions) (AccountStore, KeySetStore, VaultStore
 		return nil, nil, nil, nil, nil, fmt.Errorf("failed to generate secret key: %w", err)
 	}
 	fmt.Printf("Generated secret key: %s\n", secretKey)
+	accountId := fmt.Sprintf("%x", secretKey.AccountID)
 	// Generate a new account
 	account := &structs.Account{
-		ID:        fmt.Sprintf("%x", secretKey.AccountID),
+		ID:        accountId,
 		Email:     opts.Email,
 		FirstName: opts.FirstName,
 		LastName:  opts.LastName,
@@ -114,6 +118,7 @@ func InitializeAccount(opts *InitOptions) (AccountStore, KeySetStore, VaultStore
 	// Create a new default vault
 	vaultId := uuid.New().String()
 	vaultMeta := &structs.VaultMetadata{
+		AccountID:   accountId,
 		VaultID:     vaultId,
 		Name:        "Default",
 		Description: "Welcome to OpenVault!",
@@ -129,13 +134,14 @@ func InitializeAccount(opts *InitOptions) (AccountStore, KeySetStore, VaultStore
 		return nil, nil, nil, nil, nil, fmt.Errorf("failed to wrap vault key: %w", err)
 	}
 	vault := &structs.Vault{
-		ID:                vaultId,
+		VaultID:           vaultId,
+		AccountID:         accountId,
 		EncryptedMetadata: encVaultMeta,
 		EncryptedVaultKey: encVaultKey,
 	}
 	// Save the vault to the filesystem
 	vaultStore := make(VaultStore)
-	vaultStore[account.ID] = []*structs.Vault{vault}
+	vaultStore[vault.VaultID] = vault
 	if err := SaveVaults(vaultStore); err != nil {
 		return nil, nil, nil, nil, nil, fmt.Errorf("failed to save vaults: %w", err)
 	}
@@ -144,7 +150,7 @@ func InitializeAccount(opts *InitOptions) (AccountStore, KeySetStore, VaultStore
 	itemId := uuid.New().String()
 	itemOverview := &structs.EncryptedVaultItemOverview{
 		ItemID:    itemId,
-		VaultID:   vault.ID,
+		VaultID:   vault.VaultID,
 		CreatedAt: time.Now().Format(time.RFC3339),
 		UpdatedAt: time.Now().Format(time.RFC3339),
 	}
@@ -157,14 +163,14 @@ func InitializeAccount(opts *InitOptions) (AccountStore, KeySetStore, VaultStore
 	}
 	itemDetails := &structs.EncryptedVaultItemDetails{
 		ItemID:    itemId,
-		VaultID:   vault.ID,
+		VaultID:   vault.VaultID,
 		CreatedAt: time.Now().Format(time.RFC3339),
 		UpdatedAt: time.Now().Format(time.RFC3339),
 	}
 	err = itemDetails.Update(vaultKey, &structs.VaultItemDetails{
 		Username: opts.Email,
 		Password: opts.Password,
-		Notes:    "**Welcome to OpenVault!** This is your first item. It has your OpenVault login details.",
+		Notes:    "**Welcome to OpenVault!**\n\nThis is your first item. It contains your OpenVault login details.\n\nYou can edit or delete this item, and create new items in your vault. For more information, visit [OpenVault](https://openvault.io).\n\nEnjoy using OpenVault!",
 	})
 	if err != nil {
 		return nil, nil, nil, nil, nil, fmt.Errorf("failed to encrypt item details: %w", err)
@@ -172,12 +178,12 @@ func InitializeAccount(opts *InitOptions) (AccountStore, KeySetStore, VaultStore
 
 	// Save the item to the filesystem
 	overviewStore := make(ItemOverviewsStore)
-	overviewStore[vault.ID] = []*structs.EncryptedVaultItemOverview{itemOverview}
+	overviewStore[itemId] = itemOverview
 	if err := SaveItemOverviews(overviewStore); err != nil {
 		return nil, nil, nil, nil, nil, fmt.Errorf("failed to save overviews: %w", err)
 	}
 	detailsStore := make(ItemDetailsStore)
-	detailsStore[vault.ID] = []*structs.EncryptedVaultItemDetails{itemDetails}
+	detailsStore[itemId] = itemDetails
 	if err := SaveItemDetails(detailsStore); err != nil {
 		return nil, nil, nil, nil, nil, fmt.Errorf("failed to save details: %w", err)
 	}

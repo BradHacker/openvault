@@ -3,12 +3,16 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
-import type { LockState } from '@/lock';
+import type { LockState } from '@/context/lock';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { FloatingWindowControls } from '@/components/titlebar';
+import type { InitializeState } from '@/context/initialize';
+import type { AccountFilterState } from '@/context/account-filter';
 
 interface RootRouterContext {
   lock: LockState;
+  initialize: InitializeState;
+  accountFilter: AccountFilterState;
 }
 
 export const Route = createRootRouteWithContext<RootRouterContext>()({
@@ -37,8 +41,8 @@ function Root() {
   return (
     <Providers>
       <div className="flex h-screen w-screen flex-col">
-        <FloatingWindowControls />
         <Outlet />
+        <FloatingWindowControls />
       </div>
       <TanStackDevtools
         config={{
