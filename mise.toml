@@ -1,0 +1,14 @@
+[tools]
+bun = "latest"
+go = "1.25"
+node = "24"
+task = "latest"
+
+[env]
+_.path = "./openvault/bin"
+
+[tasks.dev]
+description = "Run the OpenVault development application"
+run = "wails3 dev"
+dir = "{{ config_root }}/openvault"
+alias = "d"
